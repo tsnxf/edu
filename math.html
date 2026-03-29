@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>教学参考 - 数学</title>
+  <link rel="stylesheet" href="./common.css" />
+  <style>
+    .app {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 18px;
+    }
+    .panel {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      box-shadow: 0 4px 18px rgba(28, 43, 79, 0.06);
+    }
+    .left {
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      height: calc(100vh - 150px);
+      overflow: auto;
+    }
+    .left h2 {
+      margin: 0;
+      font-size: 20px;
+    }
+    .sub {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+      margin: 0;
+    }
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .tab.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+    .control-group {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .row {
+      display: grid;
+      grid-template-columns: 24px 1fr 54px;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .value {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    .checks {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .checks label {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .inline-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .equation {
+      font-size: 15px;
+      padding: 10px;
+      border-radius: 10px;
+      background: #f8faff;
+      border: 1px solid var(--line);
+      font-variant-numeric: tabular-nums;
+    }
+    .data {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .metric {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px;
+      font-size: 12px;
+    }
+    .metric b {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+    .graph {
+      position: relative;
+      height: calc(100vh - 150px);
+      overflow: hidden;
+    }
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .legend {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.95);
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    @media (max-width: 980px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+      .left, .graph {
+        height: auto;
+      }
+      .graph {
+        min-height: 66vh;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="site">
+    <header class="topbar">
+      <h1 class="title">教学参考</h1>
+      <div class="auth">
+        <span class="user-badge" id="userBadge"></span>
+        <button id="openRegister">注册</button>
+        <button id="openLogin" class="primary">登录</button>
+        <button id="logoutBtn" class="danger" style="display:none;">退出登录</button>
+      </div>
+    </header>
+
+    <div class="subject-tabs">
+      <a class="subject-tab" href="./index.html">首页</a>
+      <a class="subject-tab active" href="./math.html">数学</a>
+      <a class="subject-tab" href="./physics.html">物理</a>
+      <a class="subject-tab" href="./chemistry.html">化学</a>
+    </div>
+
+    <div class="app">
+      <section class="panel left">
+        <h2>二次函数作图仿真</h2>
+        <p class="sub">支持探索、一般式、顶点式、焦点准线四种模式。</p>
+        <div class="tabs" id="tabs"></div>
+        <div class="control-group">
+          <div id="sliders"></div>
+        </div>
+        <div class="control-group">
+          <div class="checks">
+            <label><input type="checkbox" id="showVertex" checked />顶点</label>
+            <label><input type="checkbox" id="showAxis" checked />对称轴</label>
+            <label><input type="checkbox" id="showRoots" checked />根</label>
+            <label><input type="checkbox" id="showFocus" checked />焦点准线</label>
+          </div>
+        </div>
+        <div class="inline-buttons">
+          <button id="resetParams">重置参数</button>
+          <button id="toggleEq">切换方程显示</button>
+        </div>
+        <div class="equation" id="equation"></div>
+        <div class="data" id="metrics"></div>
+      </section>
+      <section class="panel graph">
+        <canvas id="canvas"></canvas>
+        <div class="legend" id="legend"></div>
+      </section>
+    </div>
+  </div>
+
+  <div class="modal-wrap" id="authModal">
+    <div class="modal">
+      <div class="modal-head">
+        <span id="modalTitle">会员登录</span>
+        <button id="closeModal">关闭</button>
+      </div>
+      <div class="field">
+        <span>用户名</span>
+        <input id="authUsername" type="text" />
+      </div>
+      <div class="field">
+        <span>密码</span>
+        <input id="authPassword" type="password" />
+      </div>
+      <div class="msg" id="authMessage"></div>
+      <div class="modal-foot">
+        <button id="modalAction" class="primary">登录</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="./auth.js"></script>
+  <script>
+    const modes = [
+      { key: "explore", label: "探索模式" },
+      { key: "standard", label: "一般式" },
+      { key: "vertex", label: "顶点式" },
+      { key: "focus", label: "焦点-准线" }
+    ];
+    const modeConfig = {
+      explore: { params: [{ key: "a", min: -4, max: 4, step: 0.1, value: 1 }, { key: "b", min: -10, max: 10, step: 0.1, value: 0 }, { key: "c", min: -12, max: 12, step: 0.1, value: 0 }] },
+      standard: { params: [{ key: "a", min: -4, max: 4, step: 0.1, value: 1 }, { key: "b", min: -10, max: 10, step: 0.1, value: 2 }, { key: "c", min: -12, max: 12, step: 0.1, value: -3 }] },
+      vertex: { params: [{ key: "a", min: -4, max: 4, step: 0.1, value: 1 }, { key: "h", min: -10, max: 10, step: 0.1, value: 0 }, { key: "k", min: -12, max: 12, step: 0.1, value: 0 }] },
+      focus: { params: [{ key: "h", min: -10, max: 10, step: 0.1, value: 0 }, { key: "k", min: -12, max: 12, step: 0.1, value: 0 }, { key: "p", min: -6, max: 6, step: 0.1, value: 2 }] }
+    };
+    const state = { mode: "explore", params: { a: 1, b: 0, c: 0, h: 0, k: 0, p: 2 }, showVertex: true, showAxis: true, showRoots: true, showFocus: true, showEq: true };
+    const tabsEl = document.getElementById("tabs");
+    const slidersEl = document.getElementById("sliders");
+    const equationEl = document.getElementById("equation");
+    const metricsEl = document.getElementById("metrics");
+    const legendEl = document.getElementById("legend");
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    const scale = 32;
+    let w = 0;
+    let h = 0;
+
+    function fmt(v) {
+      if (!isFinite(v)) return "无";
+      return Number(v.toFixed(2)).toString();
+    }
+    function signed(v) {
+      return v >= 0 ? `+${fmt(v)}` : fmt(v);
+    }
+    function toCanvas(x, y) {
+      return [w / 2 + x * scale, h / 2 - y * scale];
+    }
+    function toGraph(px, py) {
+      return [(px - w / 2) / scale, (h / 2 - py) / scale];
+    }
+    function yVal(x) {
+      if (state.mode === "vertex") return state.params.a * (x - state.params.h) ** 2 + state.params.k;
+      if (state.mode === "focus") return Math.abs(state.params.p) < 0.05 ? NaN : ((x - state.params.h) ** 2) / (4 * state.params.p) + state.params.k;
+      return state.params.a * x * x + state.params.b * x + state.params.c;
+    }
+    function coeffs() {
+      if (state.mode === "vertex") {
+        const { a, h, k } = state.params;
+        return { a, b: -2 * a * h, c: a * h * h + k };
+      }
+      if (state.mode === "focus") {
+        const { h, k, p } = state.params;
+        if (Math.abs(p) < 0.05) return { a: NaN, b: NaN, c: NaN };
+        return { a: 1 / (4 * p), b: -h / (2 * p), c: h * h / (4 * p) + k };
+      }
+      return { a: state.params.a, b: state.params.b, c: state.params.c };
+    }
+    function features() {
+      if (state.mode === "focus") {
+        const { h, k, p } = state.params;
+        const roots = [];
+        const t = -4 * p * k;
+        if (t > 0) {
+          const r = Math.sqrt(t);
+          roots.push({ x: h - r, y: 0 }, { x: h + r, y: 0 });
+        } else if (Math.abs(t) < 1e-8) roots.push({ x: h, y: 0 });
+        return { axisX: h, vertex: { x: h, y: k }, roots, yInt: yVal(0), focus: { x: h, y: k + p }, directrix: k - p };
+      }
+      const { a, b, c } = coeffs();
+      const axisX = Math.abs(a) < 1e-8 ? NaN : -b / (2 * a);
+      const d = b * b - 4 * a * c;
+      const roots = [];
+      if (Math.abs(a) > 1e-8) {
+        if (d > 1e-8) roots.push({ x: (-b - Math.sqrt(d)) / (2 * a), y: 0 }, { x: (-b + Math.sqrt(d)) / (2 * a), y: 0 });
+        else if (Math.abs(d) <= 1e-8) roots.push({ x: -b / (2 * a), y: 0 });
+      }
+      return { axisX, vertex: { x: axisX, y: yVal(axisX) }, roots, yInt: c };
+    }
+    function equation() {
+      if (state.mode === "vertex") return `y = ${fmt(state.params.a)}(x ${state.params.h >= 0 ? "-" : "+"} ${fmt(Math.abs(state.params.h))})² ${signed(state.params.k)}`;
+      if (state.mode === "focus") return `(x ${state.params.h >= 0 ? "-" : "+"} ${fmt(Math.abs(state.params.h))})² = ${fmt(4 * state.params.p)}(y ${state.params.k >= 0 ? "-" : "+"} ${fmt(Math.abs(state.params.k))})`;
+      return `y = ${fmt(state.params.a)}x² ${signed(state.params.b)}x ${signed(state.params.c)}`;
+    }
+
+    function renderControls() {
+      tabsEl.innerHTML = "";
+      modes.forEach((m) => {
+        const b = document.createElement("button");
+        b.className = `tab ${state.mode === m.key ? "active" : ""}`;
+        b.textContent = m.label;
+        b.onclick = () => {
+          state.mode = m.key;
+          modeConfig[m.key].params.forEach((p) => state.params[p.key] = p.value);
+          renderControls();
+          draw();
+        };
+        tabsEl.appendChild(b);
+      });
+      slidersEl.innerHTML = "";
+      modeConfig[state.mode].params.forEach((p) => {
+        const row = document.createElement("div");
+        row.className = "row";
+        const lb = document.createElement("span");
+        lb.textContent = p.key;
+        const input = document.createElement("input");
+        input.type = "range";
+        input.min = p.min;
+        input.max = p.max;
+        input.step = p.step;
+        input.value = state.params[p.key];
+        const value = document.createElement("span");
+        value.className = "value";
+        value.textContent = fmt(Number(input.value));
+        input.oninput = () => {
+          state.params[p.key] = Number(input.value);
+          value.textContent = fmt(state.params[p.key]);
+          draw();
+        };
+        row.append(lb, input, value);
+        slidersEl.appendChild(row);
+      });
+    }
+
+    function drawGrid() {
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = "#fff";
+      ctx.fillRect(0, 0, w, h);
+      ctx.strokeStyle = "#eef2fb";
+      for (let x = 0; x <= w; x += scale) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, h);
+        ctx.stroke();
+      }
+      for (let y = 0; y <= h; y += scale) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(w, y);
+        ctx.stroke();
+      }
+      ctx.strokeStyle = "#b0bad2";
+      ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.moveTo(w / 2, 0);
+      ctx.lineTo(w / 2, h);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(0, h / 2);
+      ctx.lineTo(w, h / 2);
+      ctx.stroke();
+      ctx.lineWidth = 1;
+    }
+    function drawCurve(fn, color) {
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      let moved = false;
+      for (let px = 0; px <= w; px += 2) {
+        const [gx] = toGraph(px, 0);
+        const gy = fn(gx);
+        if (!isFinite(gy)) continue;
+        const [, py] = toCanvas(gx, gy);
+        if (!moved) {
+          ctx.moveTo(px, py);
+          moved = true;
+        } else ctx.lineTo(px, py);
+      }
+      ctx.stroke();
+    }
+    function point(x, y, c) {
+      const [px, py] = toCanvas(x, y);
+      ctx.fillStyle = c;
+      ctx.beginPath();
+      ctx.arc(px, py, 5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    function draw() {
+      drawGrid();
+      drawCurve(yVal, "#2b84ff");
+      const f = features();
+      if (state.showAxis && isFinite(f.axisX)) {
+        const [ax] = toCanvas(f.axisX, 0);
+        ctx.strokeStyle = "#8b5cf6";
+        ctx.setLineDash([6, 4]);
+        ctx.beginPath();
+        ctx.moveTo(ax, 0);
+        ctx.lineTo(ax, h);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+      if (state.showVertex && f.vertex && isFinite(f.vertex.x) && isFinite(f.vertex.y)) point(f.vertex.x, f.vertex.y, "#00a28a");
+      if (state.showRoots) f.roots.forEach((r) => point(r.x, 0, "#d64545"));
+      point(0, f.yInt, "#f59e0b");
+      if (state.mode === "focus" && state.showFocus) {
+        point(f.focus.x, f.focus.y, "#7c3aed");
+        const [, py] = toCanvas(0, f.directrix);
+        ctx.strokeStyle = "#7c3aed";
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(0, py);
+        ctx.lineTo(w, py);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+      if (state.showEq) {
+        ctx.fillStyle = "#2b84ff";
+        ctx.font = "13px sans-serif";
+        ctx.fillText(equation(), 14, 22);
+      }
+      equationEl.textContent = equation();
+      metricsEl.innerHTML = "";
+      [["顶点", `(${fmt(f.vertex.x)}, ${fmt(f.vertex.y)})`], ["对称轴", isFinite(f.axisX) ? `x=${fmt(f.axisX)}` : "无"], ["y 截距", fmt(f.yInt)], ["实根个数", String(f.roots.length)]].forEach(([k, v]) => {
+        const el = document.createElement("div");
+        el.className = "metric";
+        el.innerHTML = `<b>${k}</b><span>${v}</span>`;
+        metricsEl.appendChild(el);
+      });
+      legendEl.innerHTML = `<div><b>模式：</b>${modes.find((m) => m.key === state.mode).label}</div><div><b>主曲线：</b>蓝色</div>`;
+    }
+
+    function resize() {
+      const rect = canvas.getBoundingClientRect();
+      const ratio = window.devicePixelRatio || 1;
+      w = Math.max(640, Math.floor(rect.width));
+      h = Math.max(420, Math.floor(rect.height));
+      canvas.width = Math.floor(w * ratio);
+      canvas.height = Math.floor(h * ratio);
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+      draw();
+    }
+
+    ["showVertex", "showAxis", "showRoots", "showFocus"].forEach((id) => {
+      const el = document.getElementById(id);
+      el.onchange = () => {
+        state[id] = el.checked;
+        draw();
+      };
+    });
+    document.getElementById("resetParams").onclick = () => {
+      modeConfig[state.mode].params.forEach((p) => state.params[p.key] = p.value);
+      renderControls();
+      draw();
+    };
+    document.getElementById("toggleEq").onclick = () => {
+      state.showEq = !state.showEq;
+      draw();
+    };
+    window.addEventListener("resize", resize);
+
+    initAuthUI();
+    renderControls();
+    resize();
+  </script>
+</body>
+</html>

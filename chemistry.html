@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>教学参考 - 化学</title>
+  <link rel="stylesheet" href="./common.css" />
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --panel: #ffffff;
+      --line: #d7ddea;
+      --ink: #1f2a44;
+      --muted: #5f6b85;
+      --primary: #3a7afe;
+      --danger: #d64545;
+    }
+    * {
+      box-sizing: border-box;
+      font-family: "SF Pro Text","PingFang SC","Helvetica Neue",Arial,sans-serif;
+    }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100vh;
+    }
+    .site {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 14px 18px 18px;
+    }
+    .topbar {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      box-shadow: 0 4px 18px rgba(28, 43, 79, 0.06);
+    }
+    .title {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 700;
+    }
+    .auth {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .user-badge {
+      font-size: 13px;
+      color: var(--muted);
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #f8faff;
+      display: none;
+    }
+    button, .subject-tab {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 13px;
+      cursor: pointer;
+      color: var(--ink);
+      text-decoration: none;
+      display: inline-block;
+    }
+    button.primary, .subject-tab.active {
+      border-color: var(--primary);
+      color: #fff;
+      background: var(--primary);
+    }
+    button.danger {
+      border-color: var(--danger);
+      color: var(--danger);
+      background: #fff;
+    }
+    .subject-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .module {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      box-shadow: 0 4px 18px rgba(28, 43, 79, 0.06);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: 520px;
+    }
+    .module h2 {
+      margin: 0;
+      font-size: 18px;
+    }
+    .desc {
+      color: var(--muted);
+      font-size: 13px;
+      margin: 0;
+      line-height: 1.45;
+    }
+    .module-block {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background: #fff;
+    }
+    .pc-row {
+      display: grid;
+      grid-template-columns: 56px 1fr 66px;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .value {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      color: var(--muted);
+    }
+    .result-line {
+      font-size: 14px;
+      color: var(--ink);
+      font-variant-numeric: tabular-nums;
+      line-height: 1.45;
+    }
+    .beaker-wrap {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #f8faff;
+      padding: 14px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 280px;
+    }
+    .beaker {
+      width: 180px;
+      height: 220px;
+      border: 3px solid #8ea1c7;
+      border-top: 0;
+      border-bottom-left-radius: 18px;
+      border-bottom-right-radius: 18px;
+      position: relative;
+      overflow: hidden;
+      background: #fff;
+    }
+    .liquid {
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      height: 50%;
+      background: #9cbcf8;
+      transition: .2s;
+    }
+    .modal-wrap {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(20, 30, 54, 0.34);
+      z-index: 20;
+    }
+    .modal-wrap.show {
+      display: flex;
+    }
+    .modal {
+      width: min(420px, calc(100vw - 24px));
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      box-shadow: 0 10px 28px rgba(28, 43, 79, 0.2);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .field input {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 9px 10px;
+      font-size: 14px;
+      outline: none;
+    }
+    .msg {
+      min-height: 18px;
+      font-size: 12px;
+      color: var(--danger);
+    }
+    .modal-foot {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="site">
+    <header class="topbar">
+      <h1 class="title">教学参考</h1>
+      <div class="auth">
+        <span class="user-badge" id="userBadge"></span>
+        <button id="openRegister">注册</button>
+        <button id="openLogin" class="primary">登录</button>
+        <button id="logoutBtn" class="danger" style="display:none;">退出登录</button>
+      </div>
+    </header>
+
+    <div class="subject-tabs">
+      <a class="subject-tab" href="./index.html">首页</a>
+      <a class="subject-tab" href="./math.html">数学</a>
+      <a class="subject-tab" href="./physics.html">物理</a>
+      <a class="subject-tab active" href="./chemistry.html">化学</a>
+    </div>
+
+    <section class="module">
+      <h2>化学：酸碱混合 pH</h2>
+      <p class="desc">模拟强酸强碱混合，实时计算溶液 pH，并通过液体颜色观察酸碱性变化。</p>
+      <div class="module-block">
+        <div class="pc-row">
+          <span>Ca</span>
+          <input id="chemCa" type="range" min="0.01" max="1.0" step="0.01" value="0.1" />
+          <span class="value" id="chemCaVal">0.1</span>
+        </div>
+        <div class="pc-row">
+          <span>Va</span>
+          <input id="chemVa" type="range" min="5" max="100" step="1" value="25" />
+          <span class="value" id="chemVaVal">25</span>
+        </div>
+        <div class="pc-row">
+          <span>Cb</span>
+          <input id="chemCb" type="range" min="0.01" max="1.0" step="0.01" value="0.1" />
+          <span class="value" id="chemCbVal">0.1</span>
+        </div>
+        <div class="pc-row">
+          <span>Vb</span>
+          <input id="chemVb" type="range" min="5" max="100" step="1" value="25" />
+          <span class="value" id="chemVbVal">25</span>
+        </div>
+      </div>
+      <div class="beaker-wrap">
+        <div class="beaker">
+          <div class="liquid" id="chemLiquid"></div>
+        </div>
+      </div>
+      <div class="module-block">
+        <div class="result-line" id="chemPh"></div>
+        <div class="result-line" id="chemNature"></div>
+      </div>
+    </section>
+  </div>
+
+  <div class="modal-wrap" id="authModal">
+    <div class="modal">
+      <div class="modal-head">
+        <span id="modalTitle">会员登录</span>
+        <button id="closeModal">关闭</button>
+      </div>
+      <div class="field">
+        <span>用户名</span>
+        <input id="authUsername" type="text" />
+      </div>
+      <div class="field">
+        <span>密码</span>
+        <input id="authPassword" type="password" />
+      </div>
+      <div class="msg" id="authMessage"></div>
+      <div class="modal-foot">
+        <button id="modalAction" class="primary">登录</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="./auth.js"></script>
+  <script>
+    const chemCaEl = document.getElementById("chemCa");
+    const chemVaEl = document.getElementById("chemVa");
+    const chemCbEl = document.getElementById("chemCb");
+    const chemVbEl = document.getElementById("chemVb");
+    const chemCaValEl = document.getElementById("chemCaVal");
+    const chemVaValEl = document.getElementById("chemVaVal");
+    const chemCbValEl = document.getElementById("chemCbVal");
+    const chemVbValEl = document.getElementById("chemVbVal");
+    const chemLiquidEl = document.getElementById("chemLiquid");
+    const chemPhEl = document.getElementById("chemPh");
+    const chemNatureEl = document.getElementById("chemNature");
+    const state = { ca: 0.1, va: 25, cb: 0.1, vb: 25 };
+
+    function fmt(v) {
+      const rounded = Math.abs(v) < 1e-8 ? 0 : v;
+      return Number(rounded.toFixed(2)).toString();
+    }
+
+    function calcChemistry() {
+      const molesH = state.ca * state.va / 1000;
+      const molesOH = state.cb * state.vb / 1000;
+      const totalV = (state.va + state.vb) / 1000;
+      let ph = 7;
+      if (molesH > molesOH) {
+        const h = (molesH - molesOH) / totalV;
+        ph = -Math.log10(h);
+      } else if (molesOH > molesH) {
+        const oh = (molesOH - molesH) / totalV;
+        ph = 14 + Math.log10(oh);
+      }
+      ph = Math.max(0, Math.min(14, ph));
+      const nature = ph < 7 ? "酸性" : (ph > 7 ? "碱性" : "中性");
+      return { ph, nature, totalMl: state.va + state.vb };
+    }
+
+    function phToColor(ph) {
+      const hue = Math.round((ph / 14) * 240);
+      return `hsl(${hue}, 75%, 62%)`;
+    }
+
+    function renderChemistry() {
+      chemCaValEl.textContent = fmt(state.ca);
+      chemVaValEl.textContent = fmt(state.va);
+      chemCbValEl.textContent = fmt(state.cb);
+      chemVbValEl.textContent = fmt(state.vb);
+      const result = calcChemistry();
+      chemPhEl.textContent = `混合后 pH = ${fmt(result.ph)}`;
+      chemNatureEl.textContent = `溶液性质：${result.nature}（总体积 ${fmt(result.totalMl)} mL）`;
+      const heightPercent = Math.max(20, Math.min(94, (result.totalMl / 200) * 100));
+      chemLiquidEl.style.height = `${heightPercent}%`;
+      chemLiquidEl.style.background = phToColor(result.ph);
+    }
+
+    function bind() {
+      chemCaEl.addEventListener("input", () => {
+        state.ca = Number(chemCaEl.value);
+        renderChemistry();
+      });
+      chemVaEl.addEventListener("input", () => {
+        state.va = Number(chemVaEl.value);
+        renderChemistry();
+      });
+      chemCbEl.addEventListener("input", () => {
+        state.cb = Number(chemCbEl.value);
+        renderChemistry();
+      });
+      chemVbEl.addEventListener("input", () => {
+        state.vb = Number(chemVbEl.value);
+        renderChemistry();
+      });
+    }
+
+    initAuthUI();
+    bind();
+    renderChemistry();
+  </script>
+</body>
+</html>
