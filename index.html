@@ -25,10 +25,156 @@
       color: var(--ink);
       min-height: 100vh;
     }
-    .app {
-      max-width: 1200px;
+    .site {
+      max-width: 1280px;
       margin: 0 auto;
-      padding: 18px;
+      padding: 14px 18px 18px;
+    }
+    .topbar {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      box-shadow: 0 4px 18px rgba(28, 43, 79, 0.06);
+    }
+    .title {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 700;
+    }
+    .auth {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .user-badge {
+      font-size: 13px;
+      color: var(--muted);
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #f8faff;
+      display: none;
+    }
+    .subject-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .subject-tab {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      border-radius: 8px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .subject-tab.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+    .subject-panel {
+      display: none;
+    }
+    .subject-panel.active {
+      display: block;
+    }
+    .subject-empty {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 26px;
+      color: var(--muted);
+      line-height: 1.65;
+      box-shadow: 0 4px 18px rgba(28, 43, 79, 0.06);
+    }
+    .module {
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: 520px;
+      max-width: 760px;
+    }
+    .module h2 {
+      margin: 0;
+      font-size: 18px;
+    }
+    .module .desc {
+      color: var(--muted);
+      font-size: 13px;
+      margin: 0;
+      line-height: 1.45;
+    }
+    .pc-row {
+      display: grid;
+      grid-template-columns: 56px 1fr 66px;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .module-block {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background: #fff;
+    }
+    .module-canvas {
+      width: 100%;
+      height: 220px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+    }
+    .result-line {
+      font-size: 14px;
+      color: var(--ink);
+      font-variant-numeric: tabular-nums;
+      line-height: 1.45;
+    }
+    .beaker-wrap {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #f8faff;
+      padding: 14px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 220px;
+    }
+    .beaker {
+      width: 140px;
+      height: 180px;
+      border: 3px solid #8ea1c7;
+      border-top: 0;
+      border-bottom-left-radius: 18px;
+      border-bottom-right-radius: 18px;
+      position: relative;
+      overflow: hidden;
+      background: #ffffff;
+    }
+    .liquid {
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      height: 50%;
+      background: #9cbcf8;
+      transition: .2s;
+    }
+    .app {
+      padding: 0;
       display: grid;
       grid-template-columns: 320px 1fr;
       gap: 18px;
@@ -44,7 +190,7 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
-      height: calc(100vh - 36px);
+      height: calc(100vh - 150px);
       overflow: auto;
     }
     h1 {
@@ -173,7 +319,7 @@
     }
     .graph {
       position: relative;
-      height: calc(100vh - 36px);
+      height: calc(100vh - 150px);
       overflow: hidden;
     }
     canvas {
@@ -224,6 +370,63 @@
       text-overflow: ellipsis;
       flex: 1;
     }
+    .modal-wrap {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(20, 30, 54, 0.34);
+      z-index: 20;
+    }
+    .modal-wrap.show {
+      display: flex;
+    }
+    .modal {
+      width: min(420px, calc(100vw - 24px));
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      box-shadow: 0 10px 28px rgba(28, 43, 79, 0.2);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .field input {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 9px 10px;
+      font-size: 14px;
+      outline: none;
+    }
+    .field input:focus {
+      border-color: var(--primary);
+    }
+    .msg {
+      min-height: 18px;
+      font-size: 12px;
+      color: var(--danger);
+    }
+    .modal-foot {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
     @media (max-width: 980px) {
       .app {
         grid-template-columns: 1fr;
@@ -234,49 +437,160 @@
       .graph {
         min-height: 66vh;
       }
+      .topbar {
+        flex-wrap: wrap;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="app">
-    <section class="panel left">
-      <h1>二次函数作图仿真</h1>
-      <p class="sub">支持“探索 / 一般式 / 顶点式 / 焦点-准线”四个模式，调节参数并观察抛物线关键特征。</p>
-
-      <div class="tabs" id="tabs"></div>
-
-      <div class="control-group">
-        <h3>参数</h3>
-        <div id="sliders"></div>
+  <div class="site">
+    <header class="topbar">
+      <h1 class="title">教学参考</h1>
+      <div class="auth">
+        <span class="user-badge" id="userBadge"></span>
+        <button id="openRegister">注册</button>
+        <button id="openLogin" class="primary">登录</button>
+        <button id="logoutBtn" class="danger" style="display:none;">退出登录</button>
       </div>
+    </header>
 
-      <div class="control-group">
-        <h3>图像要素</h3>
-        <div class="checks">
-          <label class="ck"><input type="checkbox" id="showVertex" checked />顶点</label>
-          <label class="ck"><input type="checkbox" id="showAxis" checked />对称轴</label>
-          <label class="ck"><input type="checkbox" id="showRoots" checked />根</label>
-          <label class="ck"><input type="checkbox" id="showFocus" checked />焦点/准线</label>
-          <label class="ck"><input type="checkbox" id="showCoords" checked />坐标标注</label>
-          <label class="ck"><input type="checkbox" id="showEq" checked />方程标签</label>
+    <div class="subject-tabs" id="subjectTabs">
+      <button class="subject-tab active" data-subject="math">数学</button>
+      <button class="subject-tab" data-subject="physics">物理</button>
+      <button class="subject-tab" data-subject="chemistry">化学</button>
+    </div>
+
+    <section class="subject-panel active" id="panel-math">
+      <div class="app">
+        <section class="panel left">
+          <h1>二次函数作图仿真</h1>
+          <p class="sub">支持“探索 / 一般式 / 顶点式 / 焦点-准线”四个模式，调节参数并观察抛物线关键特征。</p>
+
+          <div class="tabs" id="tabs"></div>
+
+          <div class="control-group">
+            <h3>参数</h3>
+            <div id="sliders"></div>
+          </div>
+
+          <div class="control-group">
+            <h3>图像要素</h3>
+            <div class="checks">
+              <label class="ck"><input type="checkbox" id="showVertex" checked />顶点</label>
+              <label class="ck"><input type="checkbox" id="showAxis" checked />对称轴</label>
+              <label class="ck"><input type="checkbox" id="showRoots" checked />根</label>
+              <label class="ck"><input type="checkbox" id="showFocus" checked />焦点/准线</label>
+              <label class="ck"><input type="checkbox" id="showCoords" checked />坐标标注</label>
+              <label class="ck"><input type="checkbox" id="showEq" checked />方程标签</label>
+            </div>
+          </div>
+
+          <div class="inline-buttons">
+            <button id="saveCurve" class="primary">保存当前曲线</button>
+            <button id="resetParams">重置参数</button>
+          </div>
+          <button id="clearCurves" class="danger">清空保存曲线</button>
+
+          <div class="equation" id="equation"></div>
+          <div class="data" id="metrics"></div>
+          <div class="saved-list" id="savedList"></div>
+        </section>
+
+        <section class="panel graph">
+          <canvas id="canvas"></canvas>
+          <div class="legend" id="legend"></div>
+        </section>
+      </div>
+    </section>
+
+    <section class="subject-panel" id="panel-physics">
+      <section class="panel module">
+        <h2>物理：理想气体定律</h2>
+        <p class="desc">通过调节物质的量、温度和体积，观察压强变化以及 P-V 曲线上的对应点。</p>
+        <div class="module-block">
+          <div class="pc-row">
+            <span>n</span>
+            <input id="phyN" type="range" min="0.2" max="3" step="0.1" value="1" />
+            <span class="value" id="phyNVal">1</span>
+          </div>
+          <div class="pc-row">
+            <span>T</span>
+            <input id="phyT" type="range" min="220" max="600" step="5" value="300" />
+            <span class="value" id="phyTVal">300</span>
+          </div>
+          <div class="pc-row">
+            <span>V</span>
+            <input id="phyV" type="range" min="5" max="60" step="0.5" value="24" />
+            <span class="value" id="phyVVal">24</span>
+          </div>
         </div>
-      </div>
-
-      <div class="inline-buttons">
-        <button id="saveCurve" class="primary">保存当前曲线</button>
-        <button id="resetParams">重置参数</button>
-      </div>
-      <button id="clearCurves" class="danger">清空保存曲线</button>
-
-      <div class="equation" id="equation"></div>
-      <div class="data" id="metrics"></div>
-      <div class="saved-list" id="savedList"></div>
+        <canvas class="module-canvas" id="physicsCanvas"></canvas>
+        <div class="module-block">
+          <div class="result-line" id="phyPressureKPa"></div>
+          <div class="result-line" id="phyPressureAtm"></div>
+        </div>
+      </section>
     </section>
 
-    <section class="panel graph">
-      <canvas id="canvas"></canvas>
-      <div class="legend" id="legend"></div>
+    <section class="subject-panel" id="panel-chemistry">
+      <section class="panel module">
+        <h2>化学：酸碱混合 pH</h2>
+        <p class="desc">模拟强酸强碱混合，实时计算溶液 pH，并通过液体颜色观察酸碱性变化。</p>
+        <div class="module-block">
+          <div class="pc-row">
+            <span>Ca</span>
+            <input id="chemCa" type="range" min="0.01" max="1.0" step="0.01" value="0.1" />
+            <span class="value" id="chemCaVal">0.1</span>
+          </div>
+          <div class="pc-row">
+            <span>Va</span>
+            <input id="chemVa" type="range" min="5" max="100" step="1" value="25" />
+            <span class="value" id="chemVaVal">25</span>
+          </div>
+          <div class="pc-row">
+            <span>Cb</span>
+            <input id="chemCb" type="range" min="0.01" max="1.0" step="0.01" value="0.1" />
+            <span class="value" id="chemCbVal">0.1</span>
+          </div>
+          <div class="pc-row">
+            <span>Vb</span>
+            <input id="chemVb" type="range" min="5" max="100" step="1" value="25" />
+            <span class="value" id="chemVbVal">25</span>
+          </div>
+        </div>
+        <div class="beaker-wrap">
+          <div class="beaker">
+            <div class="liquid" id="chemLiquid"></div>
+          </div>
+        </div>
+        <div class="module-block">
+          <div class="result-line" id="chemPh"></div>
+          <div class="result-line" id="chemNature"></div>
+        </div>
+      </section>
     </section>
+  </div>
+
+  <div class="modal-wrap" id="authModal">
+    <div class="modal">
+      <div class="modal-head">
+        <span id="modalTitle">会员登录</span>
+        <button id="closeModal">关闭</button>
+      </div>
+      <div class="field">
+        <span>用户名</span>
+        <input id="authUsername" type="text" />
+      </div>
+      <div class="field">
+        <span>密码</span>
+        <input id="authPassword" type="password" />
+      </div>
+      <div class="msg" id="authMessage"></div>
+      <div class="modal-foot">
+        <button id="modalAction" class="primary">登录</button>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -343,11 +657,51 @@
     const savedListEl = document.getElementById("savedList");
     const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext("2d");
+    const subjectTabsEl = document.getElementById("subjectTabs");
+    const panelMathEl = document.getElementById("panel-math");
+    const panelPhysicsEl = document.getElementById("panel-physics");
+    const panelChemistryEl = document.getElementById("panel-chemistry");
+    const userBadgeEl = document.getElementById("userBadge");
+    const openRegisterEl = document.getElementById("openRegister");
+    const openLoginEl = document.getElementById("openLogin");
+    const logoutBtnEl = document.getElementById("logoutBtn");
+    const authModalEl = document.getElementById("authModal");
+    const modalTitleEl = document.getElementById("modalTitle");
+    const authUsernameEl = document.getElementById("authUsername");
+    const authPasswordEl = document.getElementById("authPassword");
+    const modalActionEl = document.getElementById("modalAction");
+    const closeModalEl = document.getElementById("closeModal");
+    const authMessageEl = document.getElementById("authMessage");
+    const physicsCanvasEl = document.getElementById("physicsCanvas");
+    const phyNEl = document.getElementById("phyN");
+    const phyTEl = document.getElementById("phyT");
+    const phyVEl = document.getElementById("phyV");
+    const phyNValEl = document.getElementById("phyNVal");
+    const phyTValEl = document.getElementById("phyTVal");
+    const phyVValEl = document.getElementById("phyVVal");
+    const phyPressureKPaEl = document.getElementById("phyPressureKPa");
+    const phyPressureAtmEl = document.getElementById("phyPressureAtm");
+    const chemCaEl = document.getElementById("chemCa");
+    const chemVaEl = document.getElementById("chemVa");
+    const chemCbEl = document.getElementById("chemCb");
+    const chemVbEl = document.getElementById("chemVb");
+    const chemCaValEl = document.getElementById("chemCaVal");
+    const chemVaValEl = document.getElementById("chemVaVal");
+    const chemCbValEl = document.getElementById("chemCbVal");
+    const chemVbValEl = document.getElementById("chemVbVal");
+    const chemLiquidEl = document.getElementById("chemLiquid");
+    const chemPhEl = document.getElementById("chemPh");
+    const chemNatureEl = document.getElementById("chemNature");
     const scale = 32;
     let viewWidth = 0;
     let viewHeight = 0;
     let pixelRatio = window.devicePixelRatio || 1;
     let dragTarget = null;
+    let authMode = "login";
+    const pcState = {
+      physics: { n: 1, t: 300, v: 24 },
+      chemistry: { ca: 0.1, va: 25, cb: 0.1, vb: 25 }
+    };
 
     function fmt(v) {
       if (!isFinite(v)) return "无";
@@ -778,9 +1132,272 @@
       window.addEventListener("resize", resize);
     }
 
+    function initSubjectTabs() {
+      subjectTabsEl.querySelectorAll(".subject-tab").forEach((tab) => {
+        tab.onclick = () => {
+          const target = tab.dataset.subject;
+          subjectTabsEl.querySelectorAll(".subject-tab").forEach((item) => item.classList.remove("active"));
+          tab.classList.add("active");
+          panelMathEl.classList.toggle("active", target === "math");
+          panelPhysicsEl.classList.toggle("active", target === "physics");
+          panelChemistryEl.classList.toggle("active", target === "chemistry");
+          if (target === "math") resize();
+          if (target === "physics") renderPhysicsModule();
+          if (target === "chemistry") renderChemistryModule();
+        };
+      });
+    }
+
+    function calcPhysics() {
+      const { n, t, v } = pcState.physics;
+      const pressureKPa = (n * 8.314 * t) / v;
+      const pressureAtm = pressureKPa / 101.325;
+      return { pressureKPa, pressureAtm };
+    }
+
+    function renderPhysicsChart() {
+      const rect = physicsCanvasEl.getBoundingClientRect();
+      const ratio = window.devicePixelRatio || 1;
+      const w = Math.max(300, Math.floor(rect.width));
+      const h = Math.max(200, Math.floor(rect.height));
+      physicsCanvasEl.width = Math.floor(w * ratio);
+      physicsCanvasEl.height = Math.floor(h * ratio);
+      const pctx = physicsCanvasEl.getContext("2d");
+      pctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+      pctx.clearRect(0, 0, w, h);
+      pctx.fillStyle = "#ffffff";
+      pctx.fillRect(0, 0, w, h);
+
+      const m = { l: 42, r: 14, t: 14, b: 32 };
+      const plotW = w - m.l - m.r;
+      const plotH = h - m.t - m.b;
+      pctx.strokeStyle = "#d7ddea";
+      pctx.lineWidth = 1;
+      pctx.beginPath();
+      pctx.moveTo(m.l, m.t);
+      pctx.lineTo(m.l, h - m.b);
+      pctx.lineTo(w - m.r, h - m.b);
+      pctx.stroke();
+
+      const { n, t, v } = pcState.physics;
+      const minV = 5;
+      const maxV = 60;
+      const maxP = (n * 8.314 * t) / minV;
+      const xAt = (val) => m.l + ((val - minV) / (maxV - minV)) * plotW;
+      const yAt = (val) => m.t + (1 - val / maxP) * plotH;
+      pctx.strokeStyle = "#2b84ff";
+      pctx.lineWidth = 2;
+      pctx.beginPath();
+      let first = true;
+      for (let vol = minV; vol <= maxV; vol += 0.4) {
+        const pre = (n * 8.314 * t) / vol;
+        const x = xAt(vol);
+        const y = yAt(pre);
+        if (first) {
+          pctx.moveTo(x, y);
+          first = false;
+        } else {
+          pctx.lineTo(x, y);
+        }
+      }
+      pctx.stroke();
+
+      const currentP = (n * 8.314 * t) / v;
+      const cx = xAt(v);
+      const cy = yAt(currentP);
+      pctx.fillStyle = "#ef4444";
+      pctx.beginPath();
+      pctx.arc(cx, cy, 5, 0, Math.PI * 2);
+      pctx.fill();
+
+      pctx.fillStyle = "#5f6b85";
+      pctx.font = "12px sans-serif";
+      pctx.fillText("V(L)", w - m.r - 30, h - 8);
+      pctx.fillText("P(kPa)", 8, m.t + 10);
+      pctx.fillText(`当前点 (${fmt(v)}, ${fmt(currentP)})`, m.l + 8, m.t + 14);
+    }
+
+    function renderPhysicsModule() {
+      phyNValEl.textContent = fmt(pcState.physics.n);
+      phyTValEl.textContent = fmt(pcState.physics.t);
+      phyVValEl.textContent = fmt(pcState.physics.v);
+      const result = calcPhysics();
+      phyPressureKPaEl.textContent = `压强 P = ${fmt(result.pressureKPa)} kPa`;
+      phyPressureAtmEl.textContent = `约等于 ${fmt(result.pressureAtm)} atm`;
+      renderPhysicsChart();
+    }
+
+    function calcChemistry() {
+      const { ca, va, cb, vb } = pcState.chemistry;
+      const molesH = ca * va / 1000;
+      const molesOH = cb * vb / 1000;
+      const totalV = (va + vb) / 1000;
+      let ph = 7;
+      if (molesH > molesOH) {
+        const h = (molesH - molesOH) / totalV;
+        ph = -Math.log10(h);
+      } else if (molesOH > molesH) {
+        const oh = (molesOH - molesH) / totalV;
+        ph = 14 + Math.log10(oh);
+      }
+      ph = Math.max(0, Math.min(14, ph));
+      const nature = ph < 7 ? "酸性" : (ph > 7 ? "碱性" : "中性");
+      return { ph, nature, totalMl: va + vb };
+    }
+
+    function phToColor(ph) {
+      const hue = Math.round((ph / 14) * 240);
+      return `hsl(${hue}, 75%, 62%)`;
+    }
+
+    function renderChemistryModule() {
+      chemCaValEl.textContent = fmt(pcState.chemistry.ca);
+      chemVaValEl.textContent = fmt(pcState.chemistry.va);
+      chemCbValEl.textContent = fmt(pcState.chemistry.cb);
+      chemVbValEl.textContent = fmt(pcState.chemistry.vb);
+      const result = calcChemistry();
+      chemPhEl.textContent = `混合后 pH = ${fmt(result.ph)}`;
+      chemNatureEl.textContent = `溶液性质：${result.nature}（总体积 ${fmt(result.totalMl)} mL）`;
+      const heightPercent = Math.max(20, Math.min(94, (result.totalMl / 200) * 100));
+      chemLiquidEl.style.height = `${heightPercent}%`;
+      chemLiquidEl.style.background = phToColor(result.ph);
+    }
+
+    function initPcModules() {
+      phyNEl.addEventListener("input", () => {
+        pcState.physics.n = Number(phyNEl.value);
+        renderPhysicsModule();
+      });
+      phyTEl.addEventListener("input", () => {
+        pcState.physics.t = Number(phyTEl.value);
+        renderPhysicsModule();
+      });
+      phyVEl.addEventListener("input", () => {
+        pcState.physics.v = Number(phyVEl.value);
+        renderPhysicsModule();
+      });
+      chemCaEl.addEventListener("input", () => {
+        pcState.chemistry.ca = Number(chemCaEl.value);
+        renderChemistryModule();
+      });
+      chemVaEl.addEventListener("input", () => {
+        pcState.chemistry.va = Number(chemVaEl.value);
+        renderChemistryModule();
+      });
+      chemCbEl.addEventListener("input", () => {
+        pcState.chemistry.cb = Number(chemCbEl.value);
+        renderChemistryModule();
+      });
+      chemVbEl.addEventListener("input", () => {
+        pcState.chemistry.vb = Number(chemVbEl.value);
+        renderChemistryModule();
+      });
+      renderPhysicsModule();
+      renderChemistryModule();
+    }
+
+    function getUsers() {
+      try {
+        const raw = localStorage.getItem("edu_users") || "[]";
+        const users = JSON.parse(raw);
+        return Array.isArray(users) ? users : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function setUsers(users) {
+      localStorage.setItem("edu_users", JSON.stringify(users));
+    }
+
+    function setCurrentUser(username) {
+      if (username) localStorage.setItem("edu_current_user", username);
+      else localStorage.removeItem("edu_current_user");
+      updateAuthView();
+    }
+
+    function getCurrentUser() {
+      return localStorage.getItem("edu_current_user") || "";
+    }
+
+    function updateAuthView() {
+      const current = getCurrentUser();
+      const loggedIn = !!current;
+      userBadgeEl.style.display = loggedIn ? "inline-flex" : "none";
+      userBadgeEl.textContent = loggedIn ? `会员：${current}` : "";
+      openRegisterEl.style.display = loggedIn ? "none" : "inline-block";
+      openLoginEl.style.display = loggedIn ? "none" : "inline-block";
+      logoutBtnEl.style.display = loggedIn ? "inline-block" : "none";
+    }
+
+    function openAuthModal(mode) {
+      authMode = mode;
+      modalTitleEl.textContent = mode === "login" ? "会员登录" : "会员注册";
+      modalActionEl.textContent = mode === "login" ? "登录" : "注册";
+      authUsernameEl.value = "";
+      authPasswordEl.value = "";
+      authMessageEl.textContent = "";
+      authModalEl.classList.add("show");
+    }
+
+    function closeAuthModal() {
+      authModalEl.classList.remove("show");
+      authMessageEl.textContent = "";
+    }
+
+    function submitAuth() {
+      const username = authUsernameEl.value.trim();
+      const password = authPasswordEl.value;
+      if (!username || !password) {
+        authMessageEl.textContent = "请输入用户名和密码";
+        return;
+      }
+      const users = getUsers();
+      if (authMode === "register") {
+        const exists = users.some((u) => u.username === username);
+        if (exists) {
+          authMessageEl.textContent = "用户名已存在";
+          return;
+        }
+        users.push({ username, password });
+        setUsers(users);
+        setCurrentUser(username);
+        closeAuthModal();
+        return;
+      }
+      const match = users.find((u) => u.username === username && u.password === password);
+      if (!match) {
+        authMessageEl.textContent = "用户名或密码错误";
+        return;
+      }
+      setCurrentUser(username);
+      closeAuthModal();
+    }
+
+    function initAuth() {
+      updateAuthView();
+      openRegisterEl.onclick = () => openAuthModal("register");
+      openLoginEl.onclick = () => openAuthModal("login");
+      closeModalEl.onclick = closeAuthModal;
+      modalActionEl.onclick = submitAuth;
+      logoutBtnEl.onclick = () => setCurrentUser("");
+      authModalEl.addEventListener("click", (e) => {
+        if (e.target === authModalEl) closeAuthModal();
+      });
+      authPasswordEl.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") submitAuth();
+      });
+      authUsernameEl.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") submitAuth();
+      });
+    }
+
     renderControls();
     initCheckboxes();
     bindEvents();
+    initSubjectTabs();
+    initAuth();
+    initPcModules();
     resize();
   </script>
 </body>
