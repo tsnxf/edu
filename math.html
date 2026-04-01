@@ -79,8 +79,47 @@
     }
     .inline-buttons {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr 1fr 1fr;
       gap: 8px;
+    }
+    .saved-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .saved-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 10px;
+      background: #f8faff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      font-size: 13px;
+    }
+    .saved-item-color {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+    .saved-item-eq {
+      flex: 1;
+      font-variant-numeric: tabular-nums;
+    }
+    .delete-btn {
+      background: transparent;
+      border: none;
+      color: var(--danger);
+      cursor: pointer;
+      padding: 4px;
+      font-size: 12px;
+    }
+    .delete-btn:hover {
+      text-decoration: underline;
     }
     .equation {
       font-size: 15px;
@@ -178,10 +217,12 @@
         </div>
         <div class="inline-buttons">
           <button id="resetParams">重置参数</button>
-          <button id="toggleEq">切换方程显示</button>
+          <button id="toggleEq">隐藏方程</button>
+          <button id="saveCurve">保存曲线</button>
         </div>
         <div class="equation" id="equation"></div>
         <div class="data" id="metrics"></div>
+        <div class="saved-list" id="savedList"></div>
       </section>
       <section class="panel graph">
         <canvas id="canvas"></canvas>
@@ -226,11 +267,14 @@
       focus: { params: [{ key: "h", min: -10, max: 10, step: 0.1, value: 0 }, { key: "k", min: -12, max: 12, step: 0.1, value: 0 }, { key: "p", min: -6, max: 6, step: 0.1, value: 2 }] }
     };
     const state = { mode: "explore", params: { a: 1, b: 0, c: 0, h: 0, k: 0, p: 2 }, showVertex: true, showAxis: true, showRoots: true, showFocus: true, showEq: true };
+    const savedCurves = [];
+    const curveColors = ["#f59e0b", "#10b981", "#8b5cf6", "#ec4899", "#06b6d4", "#eab308"];
     const tabsEl = document.getElementById("tabs");
     const slidersEl = document.getElementById("sliders");
     const equationEl = document.getElementById("equation");
     const metricsEl = document.getElementById("metrics");
     const legendEl = document.getElementById("legend");
+    const savedListEl = document.getElementById("savedList");
     const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext("2d");
     const scale = 32;
@@ -388,6 +432,9 @@
     }
     function draw() {
       drawGrid();
+      savedCurves.forEach(c => {
+        drawCurve(c.fn, c.color);
+      });
       drawCurve(yVal, "#2b84ff");
       const f = features();
       if (state.showAxis && isFinite(f.axisX)) {
@@ -427,7 +474,11 @@
         el.innerHTML = `<b>${k}</b><span>${v}</span>`;
         metricsEl.appendChild(el);
       });
-      legendEl.innerHTML = `<div><b>模式：</b>${modes.find((m) => m.key === state.mode).label}</div><div><b>主曲线：</b>蓝色</div>`;
+      let legendHtml = `<div><b>模式：</b>${modes.find((m) => m.key === state.mode).label}</div><div><b style="color:#2b84ff">■</b> <b>主曲线</b></div>`;
+      savedCurves.forEach((c, i) => {
+        legendHtml += `<div><b style="color:${c.color}">■</b> <b>曲线${i+1}</b></div>`;
+      });
+      legendEl.innerHTML = legendHtml;
     }
 
     function resize() {
@@ -453,10 +504,65 @@
       renderControls();
       draw();
     };
-    document.getElementById("toggleEq").onclick = () => {
+    document.getElementById("toggleEq").onclick = (e) => {
       state.showEq = !state.showEq;
+      e.target.textContent = state.showEq ? "隐藏方程" : "显示方程";
       draw();
     };
+
+    function createYVal(mode, params) {
+      return function(x) {
+        if (mode === "vertex") return params.a * (x - params.h) ** 2 + params.k;
+        if (mode === "focus") return Math.abs(params.p) < 0.05 ? NaN : ((x - params.h) ** 2) / (4 * params.p) + params.k;
+        return params.a * x * x + params.b * x + params.c;
+      };
+    }
+
+    function renderSavedList() {
+      savedListEl.innerHTML = "";
+      savedCurves.forEach((c, index) => {
+        const item = document.createElement("div");
+        item.className = "saved-item";
+        item.innerHTML = `
+          <div class="saved-item-eq">
+            <span class="saved-item-color" style="background: ${c.color}"></span>
+            <b style="color: ${c.color}; margin-right: 6px;">曲线${index + 1}</b>
+            ${c.eq}
+          </div>
+          <button class="delete-btn" data-index="${index}">删除</button>
+        `;
+        savedListEl.appendChild(item);
+      });
+      const deleteBtns = savedListEl.querySelectorAll(".delete-btn");
+      deleteBtns.forEach(btn => {
+        btn.onclick = (e) => {
+          const idx = Number(e.target.getAttribute("data-index"));
+          savedCurves.splice(idx, 1);
+          renderSavedList();
+          draw();
+        };
+      });
+    }
+
+    document.getElementById("saveCurve").onclick = () => {
+      if (savedCurves.length >= 6) {
+        alert("最多保存 6 条曲线");
+        return;
+      }
+      const eq = equation();
+      if (savedCurves.some(c => c.eq === eq)) {
+        alert("该曲线已保存");
+        return;
+      }
+      savedCurves.push({
+        eq: eq,
+        fn: createYVal(state.mode, JSON.parse(JSON.stringify(state.params))),
+        color: curveColors[savedCurves.length % curveColors.length]
+      });
+      renderSavedList();
+      draw();
+    };
+
     window.addEventListener("resize", resize);
 
     initAuthUI();
