@@ -1,0 +1,721 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>教学参考 - Markdown</title>
+  <link rel="stylesheet" href="./common.css" />
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --panel: #ffffff;
+      --line: #d7ddea;
+      --ink: #1f2a44;
+      --muted: #5f6b85;
+      --primary: #3a7afe;
+      --danger: #d64545;
+    }
+    * {
+      box-sizing: border-box;
+      font-family: "SF Pro Text","PingFang SC","Helvetica Neue",Arial,sans-serif;
+    }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100vh;
+    }
+    .site {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 14px 18px 18px;
+    }
+    .topbar {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      box-shadow: 0 4px 18px rgba(28, 43, 79, 0.06);
+    }
+    .title {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 700;
+    }
+    .auth {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .user-badge {
+      font-size: 13px;
+      color: var(--muted);
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #f8faff;
+      display: none;
+    }
+    button, .subject-tab {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 13px;
+      cursor: pointer;
+      color: var(--ink);
+      text-decoration: none;
+      display: inline-block;
+    }
+    button.primary, .subject-tab.active {
+      border-color: var(--primary);
+      color: #fff;
+      background: var(--primary);
+    }
+    button.danger {
+      border-color: var(--danger);
+      color: var(--danger);
+      background: #fff;
+    }
+    .subject-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .module {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      box-shadow: 0 4px 18px rgba(28, 43, 79, 0.06);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: 520px;
+    }
+    .module h2 {
+      margin: 0;
+      font-size: 18px;
+    }
+    .desc {
+      color: var(--muted);
+      font-size: 13px;
+      margin: 0;
+      line-height: 1.45;
+    }
+    .editor-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      flex: 1;
+      min-height: 400px;
+    }
+    .editor-pane {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      overflow: hidden;
+    }
+    .editor-header {
+      background: #f8faff;
+      padding: 8px 14px;
+      font-size: 14px;
+      font-weight: 600;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .textarea-wrapper {
+      flex: 1;
+      display: flex;
+    }
+    textarea {
+      width: 100%;
+      height: 100%;
+      border: none;
+      padding: 14px;
+      font-size: 14px;
+      line-height: 1.6;
+      resize: none;
+      outline: none;
+      font-family: inherit;
+    }
+    .preview-pane {
+      padding: 14px;
+      flex: 1;
+      overflow-y: auto;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+    /* Simple markdown preview styles */
+    .preview-pane h1, .preview-pane h2, .preview-pane h3 {
+      margin-top: 0;
+    }
+    .preview-pane p {
+      margin-bottom: 12px;
+    }
+    .preview-pane code {
+      background: #f1f3f8;
+      padding: 2px 4px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 0.9em;
+    }
+    .preview-pane pre {
+      background: #f1f3f8;
+      padding: 12px;
+      border-radius: 6px;
+      overflow-x: auto;
+    }
+    .preview-pane blockquote {
+      border-left: 4px solid var(--primary);
+      margin: 0;
+      padding-left: 12px;
+      color: var(--muted);
+    }
+    
+    .modal-wrap {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(20, 30, 54, 0.34);
+      z-index: 20;
+    }
+    .modal-wrap.show {
+      display: flex;
+    }
+    .modal {
+      width: min(420px, calc(100vw - 24px));
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      box-shadow: 0 10px 28px rgba(28, 43, 79, 0.2);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .field input {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 9px 10px;
+      font-size: 14px;
+      outline: none;
+    }
+    .msg {
+      min-height: 18px;
+      font-size: 12px;
+      color: var(--danger);
+    }
+    .modal-foot {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    @media (max-width: 768px) {
+      .editor-container {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="site">
+    <header class="topbar">
+      <h1 class="title">教学参考</h1>
+      <div class="auth">
+        <span class="user-badge" id="userBadge"></span>
+        <button id="openRegister">注册</button>
+        <button id="openLogin" class="primary">登录</button>
+        <button id="logoutBtn" class="danger" style="display:none;">退出登录</button>
+      </div>
+    </header>
+
+    <div class="subject-tabs">
+      <a class="subject-tab" href="./index.html">首页</a>
+      <a class="subject-tab" href="./math.html">数学</a>
+      <a class="subject-tab" href="./physics.html">物理</a>
+      <a class="subject-tab" href="./chemistry.html">化学</a>
+      <a class="subject-tab active" href="./markdown.html">Markdown</a>
+    </div>
+
+    <section class="module">
+      <h2>Markdown 技能学习与实践</h2>
+      <p class="desc">在这里您可以充分学习 Markdown，点击不同按钮切换阅读教程或进行模拟测试！</p>
+
+      <div class="module-actions" style="margin-bottom: 12px; display: flex; gap: 8px;">
+        <button id="lectureBtn" class="primary">Lecture</button>
+        <button id="practiceBtn">Practice</button>
+      </div>
+      
+      <div class="editor-container" id="regularMode">
+        <div class="editor-pane">
+          <div class="editor-header">
+            <span>编辑器</span>
+            <button id="clearBtn" style="padding: 2px 8px; font-size: 12px;">清空</button>
+          </div>
+          <div class="textarea-wrapper">
+            <textarea id="mdInput"></textarea>
+          </div>
+        </div>
+        
+        <div class="editor-pane">
+          <div class="editor-header">
+            <span>实时预览</span>
+          </div>
+          <div class="preview-pane" id="mdPreview">
+          </div>
+        </div>
+      </div>
+
+      <div class="editor-container" id="practiceMode" style="display: none;">
+        <div class="editor-pane" style="flex-direction: column; overflow: hidden;">
+          <div class="editor-header"><span>目标排版结果 (Target Text)</span></div>
+          <div class="preview-pane" id="targetHtmlPane" style="border-bottom: 1px solid var(--line); flex: auto; max-height: 50%; overflow-y: auto;"></div>
+          
+          <div class="editor-header"><span>您的实时结果 (Your Rendered Output)</span></div>
+          <div class="preview-pane" id="practicePreview" style="flex: auto; overflow-y: auto;"></div>
+        </div>
+        
+        <div class="editor-pane">
+          <div class="editor-header">
+            <span>练习编辑器</span>
+            <button id="clearPracticeBtn" style="padding: 2px 8px; font-size: 12px;">重置输入</button>
+          </div>
+          <div class="textarea-wrapper">
+            <textarea id="practiceInput" placeholder="在这里输入 Markdown 以匹配左上方目标文本的排版效果..."></textarea>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="modal-wrap" id="authModal">
+    <div class="modal">
+      <div class="modal-head">
+        <span id="modalTitle">会员登录</span>
+        <button id="closeModal">关闭</button>
+      </div>
+      <div class="field">
+        <span>用户名</span>
+        <input id="authUsername" type="text" />
+      </div>
+      <div class="field">
+        <span>密码</span>
+        <input id="authPassword" type="password" />
+      </div>
+      <div class="msg" id="authMessage"></div>
+      <div class="modal-foot">
+        <button id="modalAction" class="primary">登录</button>
+      </div>
+    </div>
+  </div>
+
+  <script id="lectureContent" type="text/markdown">
+# 📚 Markdown 精通：从纯文本到出版物
+
+**(讲座时间：30分钟 | 目标：掌握Markdown的全部语法并能熟练使用)**
+
+## 🧑🏫 引言：Markdown 到底是什么？ (5分钟)
+
+### 🎯 目标：理解“为什么”要学习它
+
+*   **存在的问题：** 标准的文本编辑器（比如记事本）会剥离所有格式。如果你写了一份报告，然后把它粘贴到其他地方，你所有的粗体、标题、列
+表都会消失。
+*   **解决方案：** Markdown 是一种**轻量级标记语言 (Lightweight Markup Language)**。它允许你使用简单、易读的纯文本语法来应用结构化格式
+（如标题、加粗、链接），然后这些内容可以轻松地转换为复杂的格式，比如 HTML、PDF 或富文本文件。
+*   **核心原则 (关键点)：** 你是为**机器**编写标记，但给人的感觉是像为**人**写作。
+
+> **💡 关键总结：** 你写的是**语法 (Syntax)**，而不是**格式 (Formatting)**。你写 `#` 而不是点击“H1”按钮。
+
+---
+
+## 🏗️ 第一部分：基础知识 (基础结构) (10分钟)
+
+这是你 90% 的时间都会用到的元素。必须掌握它们。
+
+### 1. 标题 (Headers)
+
+Markdown 使用井号符号 (`#`) 来定义标题。井号越多，标题级别越低（越大）。
+
+| Markdown 语法 | 效果 (概念上) | 用途场景 |
+| :--- | :--- | :--- |
+| `# 主要标题` | H1 (最大) | 文档的整体主标题。 |
+| `## 章节标题` | H2 | 文档的主要章节划分。 |
+| `### 小节标题` | H3 | 章节下的具体子主题。 |
+| `#### 细节标题` | H4 | 说明、示例等小块内容。 |
+
+**🔥 专业提示：** 不要跳过标题级别（H1 → H2 → H3）。这能让你的文档结构是逻辑清晰、可导航的。
+
+### 2. 强调 (Emphasis)
+
+这是让文字“显眼”的方法。
+
+*   **加粗 (Bold):** 使用双星号：`**加粗文字**`
+*   **斜体 (Italics):** 使用单星号：`*斜体文字*`
+*   **加粗和斜体:** 组合使用：`***极度强调***`
+
+### 3. 段落与换行
+
+*   **段落分隔：** 简单地换行，然后空一行 (即按两次 Enter)。这信号告诉编辑器：“这是一个新的段落块”。
+*   **硬回车 (Hard Return)：** 如果你只是想换行，但不想开始一个新段落，你需要在行尾添加两个空格，然后按 Enter (或者使用 `<br>` 标签，
+取决于平台支持)。
+
+### 4. 列表 (Lists)
+
+*   **无序列表 (Bullet Points)：** 在行首使用 `*` (星号)、`-` (破折号) 或 `+`。
+    ```markdown
+    * 第一项
+    * 第二项
+    ```
+*   **有序列表 (Numbered)：** 在行首使用数字和点号：`1.`
+    ```markdown
+    1. 第一步
+    2. 第二步
+    3. 第三步
+    ```
+
+---
+
+## 🌐 第二部分：进阶概念 (增加功能性) (10分钟)
+
+了解了如何结构化文本后，我们来增加内容和完善细节。
+
+### 1. 链接 (Links)
+
+结构总是：`[显示显示的文字](实际的URL)`
+
+**示例:**
+`[查看 Markdown 规范](https://www.marked.com/)[这是一个链接]`
+
+### 2. 图片 (Images)
+
+图片使用与链接几乎相同的语法，但开头需要加一个感叹号 (`!`)。
+
+`![替代文本，用于无障碍阅读](图片的URL地址)`
+
+> **🧠 Alt Text 的重要性：** 务必包含 `[替代文本]`！这对于屏幕阅读器和搜索引擎优化 (SEO) 至关重要。
+
+### 3. 代码块 (Code Blocks)
+
+撰写技术文档时，*必须*展示代码。Markdown 提供了两种方法：
+
+*   **行内代码 (Inline Code):** 用于句子中的短小代码片段。使用单个反引号 (\` \`)。
+    **示例:** 如果你想引用函数 `var x = 5;`，你会写：\`该函数是 \`var x = 5;\`\`。
+*   **代码块 (Code Blocks):** 用于多行代码。使用三个反引号 (\`\`\`) 并最好指定语言（这称为*语法高亮*）。
+    ```markdown
+    ```javascript
+    function calculate(a, b) {
+      return a + b;
+    }
+    ```
+    ```
+
+### 4. 引用块 (Blockquotes)
+
+使用大于号 (`>`) 来引用文字。
+
+> 这是一段引用的文字。它标志着接下来的文字是归属于其他人物或来源的，有助于文章的语气和可信度。
+
+---
+
+## ✨ 第三部分：高阶技巧与掌握诀窍 (5分钟)
+
+如果想成为*专家*，就必须掌握这些进阶但极实用的结构。
+
+### 1. 表格 (Tables)
+
+表格语法有点难，但一旦掌握了，就非常高效。表格使用管道符 (`|`) 定义列，并使用破折号 (`-`) 定义分隔行。
+
+```markdown
+| 标题 1 (左对齐) | 标题 2 (居中) | 标题 3 (右对齐) |
+| :--- | :---: | ---: |
+| 数据 A | 数据 B | 数据 C |
+| 更多数据 | 更好的数据 | 最好的数据 |
+```
+*(注：冒号 `:` 可以控制文本的对齐方式。)*
+
+### 2. 水平线 (Horizontal Rule)
+
+单独一行使用三个破折号 (`---`)。这会创建一个干净、醒目的视觉分隔线。
+
+`---`
+
+### 3. YAML 前置信息 (Front Matter)
+
+当你使用静态网站生成器（如 Jekyll 或 Hugo）时，你经常需要在文件顶部放置元数据（Metadata）。这部分被称为 **前置信息 (Front Matter)**，
+它被 `---` 包围。
+
+```markdown
+---
+title: 我的酷炫文章
+date: 2023-10-26
+author: [你的名字]
+tags: markdown, 教程
+---
+
+# 实际文章内容从这里开始...
+```
+
+---
+
+## 🚀 总结与实战计划
+
+### 📝 快速参考速查表
+
+| 目标 | 语法 | 示例 |
+| :--- | :--- | :--- |
+| **级别 1 标题** | `# 标题` | `# 欢迎来到 Markdown` |
+| **加粗** | `**文字**` | `**重要**` |
+| **斜体** | `*文字*` | `*提示*` |
+| **无序列表** | `* 项目` | `* 项目` |
+| **代码块** | \`\`\`lang\n代码\n\`\`\` | \`\`\`python\nprint("hi")\n\`\`\` |
+| **链接** | `[文字](URL)` | `[百度](https://baidu.com)` |
+| **表格** | `|---|---|` | *请参考示例* |
+
+### 📚 巩固练习 (如何变得熟练)
+
+学习Markdown的唯一方法就是**动手写**。
+
+1.  **“知识文档倾泻”：** 选择一个你非常了解的复杂主题（你的工作、一个爱好，或如何烤面包）。
+2.  **不要使用图形界面编辑器。** 打开一个纯文本文件或使用在线 Markdown 沙盒 (如 Dillinger 或 Markdown Live Preview)。
+3.  **强迫自己**使用标题、列表、表格、代码块和引用块来解释你的主题。
+
+通过这种方式，你将从“知道语法”过渡到“用Markdown思维思考”，这就是精通的定义！
+
+---
+*(讲座结束)*
+  </script>
+  <script src="./auth.js"></script>
+  <script>
+    const mdInput = document.getElementById("mdInput");
+    const mdPreview = document.getElementById("mdPreview");
+    const clearBtn = document.getElementById("clearBtn");
+    const lectureBtn = document.getElementById("lectureBtn");
+    const practiceBtn = document.getElementById("practiceBtn");
+    const regularMode = document.getElementById("regularMode");
+    const practiceMode = document.getElementById("practiceMode");
+    const targetHtmlPane = document.getElementById("targetHtmlPane");
+    const practicePreview = document.getElementById("practicePreview");
+    const practiceInput = document.getElementById("practiceInput");
+    const clearPracticeBtn = document.getElementById("clearPracticeBtn");
+
+    const fullLectureText = document.getElementById('lectureContent').textContent.trim();
+
+    let currentPracticeHTML = "";
+
+    function generatePracticeHTML() {
+      const h1Pool = ['# 技能测试靶场', '# 今日训练计划', '# Markdown 实战'];
+      const h2Pool = ['## 第一阶段', '## 基础挑战回合', '## 核心任务'];
+      const h3Pool = ['### 关键步骤', '### 细节补充', '### 附加内容说明'];
+      const boldPool = ['一定不要忘记使用 **加粗样式** 来强调。', '这句话里面有一个 **非常重要** 的词汇。'];
+      const italicPool = ['并且，有些话听起来像 *窃窃私语*。', '这是一段包含了 *斜体测试* 的特殊文本。'];
+      const quotePool = ['> 成功的秘诀在于持续的练习和不懈的代码敲击。', '> 纸上得来终觉浅，绝知此事要躬行。'];
+      const listPool = ['- 多想\n- 多练\n- 多总结', '- 观察\n- 假设\n- 验证'];
+      const codePool = ['输入代码指令 \`git pull origin main\` 即可更新。', '不要忘记配置环境变量 \`export PATH=/bin\`。'];
+      const linkPool = ['查看完整的 [在线文档站点](https://docs.hello.com)', '如果有任何系统问题请访问 [GitHub](https://github.com/issues)'];
+
+      const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+      
+      const rawMd = [
+        pick(h1Pool),
+        pick(h2Pool),
+        pick(h3Pool),
+        pick(boldPool),
+        pick(italicPool),
+        pick(quotePool),
+        pick(listPool),
+        pick(codePool),
+        pick(linkPool)
+      ].join('\n\n');
+
+      return simpleMarkdownParse(rawMd);
+    }
+
+    function simpleMarkdownParse(text) {
+      let html = text;
+      
+      const codeBlocks = [];
+      html = html.replace(/```(\w*)\n([\s\S]*?)```/g, function(match, lang, code) {
+        let placeholder = `__CODE_BLOCK_${codeBlocks.length}__`;
+        codeBlocks.push(`<pre style="background: var(--bg); padding: 12px; border-radius: 6px; overflow-x: auto; border: 1px solid var(--line); font-family: monospace;"><code>${code.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>`);
+        return placeholder;
+      });
+
+      html = html.replace(/^(#{1,6})\s+(.*)$/gm, function(match, hash, content) {
+        const level = hash.length;
+        return `<h${level}>${content}</h${level}>`;
+      });
+      
+      html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+      html = html.replace(/!\[(.*?)\]\((.*?)\)/g, '<img src="$2" alt="$1" style="max-width:100%; border-radius:4px;" />');
+      html = html.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" style="color: var(--primary); text-decoration: none;">$1</a>');
+      html = html.replace(/`(.*?)`/g, '<code style="background: #f0f0f0; padding: 2px 4px; border-radius: 4px; font-family: monospace;">$1</code>');
+      
+      html = html.replace(/^>\s+(.*)$/gm, '<blockquote style="border-left: 4px solid var(--primary); padding-left: 10px; color: #666; margin: 10px 0;">$1</blockquote>');
+      
+      let paragraphs = html.split(/\n\n+/);
+      html = paragraphs.map(p => {
+        if (p.trim().startsWith('|')) {
+          let lines = p.trim().split('\n');
+          if (lines.length >= 2 && lines[1].indexOf('---') !== -1) {
+            let tableHtml = '<table style="width:100%; border-collapse: collapse; margin: 10px 0; font-size: 14px;">';
+            lines.forEach((line, index) => {
+              if (index === 1) return;
+              let cells = line.split('|').filter((c, i, a) => {
+                return !(i === 0 && c.trim() === '') && !(i === a.length - 1 && c.trim() === '');
+              });
+              if (index === 0) {
+                tableHtml += '<thead><tr>' + cells.map(c => `<th style="border: 1px solid var(--line); padding: 8px; background: #fafafa; text-align: left;">${c.trim()}</th>`).join('') + '</tr></thead><tbody>';
+              } else {
+                tableHtml += '<tr>' + cells.map(c => `<td style="border: 1px solid var(--line); padding: 8px;">${c.trim()}</td>`).join('') + '</tr>';
+              }
+            });
+            tableHtml += '</tbody></table>';
+            return tableHtml;
+          }
+        }
+        
+        let uMatch = p.match(/^([*\-+])\s+/m);
+        if (uMatch) {
+          let listItems = p.split('\n');
+          let ulHtml = '<ul style="padding-left: 20px; margin: 10px 0;">';
+          let inLi = false;
+          listItems.forEach(line => {
+            if (line.trim().match(/^([*\-+])\s+/)) {
+               if (inLi) ulHtml += '</li>';
+               ulHtml += `<li>${line.replace(/^([*\-+])\s+/, '')}`;
+               inLi = true;
+            } else if (inLi && line.trim() !== '') {
+               ulHtml += `<br>${line}`;
+            }
+          });
+          if (inLi) ulHtml += '</li>';
+          ulHtml += '</ul>';
+          return ulHtml;
+        }
+        
+        if (p.match(/^\d+\.\s+/m)) {
+          let listItems = p.split('\n');
+          let olHtml = '<ol style="padding-left: 20px; margin: 10px 0;">';
+          let inLi = false;
+          listItems.forEach(line => {
+            if (line.trim().match(/^\d+\.\s+/)) {
+               if (inLi) olHtml += '</li>';
+               olHtml += `<li>${line.replace(/^\d+\.\s+/, '')}`;
+               inLi = true;
+            } else if (inLi && line.trim() !== '') {
+               olHtml += `<br>${line}`;
+            }
+          });
+          if (inLi) olHtml += '</li>';
+          olHtml += '</ol>';
+          return olHtml;
+        }
+
+        if (!p.startsWith('<h') && !p.startsWith('<blockquote') && !p.startsWith('__CODE_BLOCK_') && !p.startsWith('<table') && !p.startsWith('<ul') && !p.startsWith('<ol')) {
+          return `<p style="margin: 10px 0;">${p.replace(/\n/g, '<br>')}</p>`;
+        }
+        return p;
+      }).join('\n');
+      
+      codeBlocks.forEach((block, i) => {
+        html = html.replace(`__CODE_BLOCK_${i}__`, block);
+      });
+      
+      return html;
+    }
+
+    function renderPreview() {
+      mdPreview.innerHTML = simpleMarkdownParse(mdInput.value);
+    }
+
+    function checkMatch() {
+      let target = (targetHtmlPane.innerHTML || "").replace(/\\s+/g, "");
+      let curr = (practicePreview.innerHTML || "").replace(/\\s+/g, "");
+      if (target && curr && target === curr) {
+          practicePreview.style.backgroundColor = "#e6fffa";
+          practicePreview.style.boxShadow = "inset 0 0 0 2px #10b981";
+      } else {
+          practicePreview.style.backgroundColor = "transparent";
+          practicePreview.style.boxShadow = "none";
+      }
+    }
+
+    mdInput.addEventListener("input", renderPreview);
+    
+    clearBtn.addEventListener("click", () => {
+      mdInput.value = "";
+      renderPreview();
+    });
+
+    lectureBtn.addEventListener("click", () => {
+      lectureBtn.classList.add("primary");
+      practiceBtn.classList.remove("primary");
+      regularMode.style.display = "grid";
+      practiceMode.style.display = "none";
+      mdInput.value = fullLectureText;
+      renderPreview();
+    });
+
+    practiceBtn.addEventListener("click", () => {
+      practiceBtn.classList.add("primary");
+      lectureBtn.classList.remove("primary");
+      regularMode.style.display = "none";
+      practiceMode.style.display = "grid";
+      
+      currentPracticeHTML = generatePracticeHTML();
+      targetHtmlPane.innerHTML = currentPracticeHTML;
+      practiceInput.value = "";
+      practicePreview.innerHTML = "";
+      checkMatch();
+    });
+
+    practiceInput.addEventListener("input", () => {
+      practicePreview.innerHTML = simpleMarkdownParse(practiceInput.value);
+      checkMatch();
+    });
+
+    clearPracticeBtn.addEventListener("click", () => {
+      practiceInput.value = "";
+      practicePreview.innerHTML = "";
+      checkMatch();
+    });
+
+    if (typeof initAuthUI === 'function') {
+      initAuthUI();
+    }
+    
+    // Init state
+    mdInput.value = fullLectureText;
+    renderPreview();
+  </script>
+</body>
+</html>
