@@ -6,51 +6,345 @@
   <title>教学参考 - 首页</title>
   <link rel="stylesheet" href="./common.css" />
   <style>
-    .placeholder {
+    /* ========== 主页专属高级 UI 样式 ========== */
+    body {
       background: #fff;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      box-shadow: 0 4px 18px rgba(28, 43, 79, 0.06);
-      padding: 24px;
+    }
+    
+    /* 重塑导航栏，融入页面 */
+    .site-header-wrapper {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(215, 221, 234, 0.6);
+    }
+    .site-header-wrapper .site {
+      padding-bottom: 0;
+      padding-top: 16px;
+    }
+    .topbar {
+      margin-bottom: 16px;
+      border: none;
+      box-shadow: none;
+      padding: 0;
+      background: transparent;
+    }
+    .subject-tabs {
+      margin-bottom: 0;
+      gap: 24px;
+    }
+    .subject-tab {
+      border: none;
+      background: transparent;
+      padding: 0 0 12px 0;
+      border-radius: 0;
+      font-size: 15px;
       color: var(--muted);
-      min-height: 320px;
+      font-weight: 500;
+      position: relative;
+    }
+    .subject-tab:hover {
+      color: var(--ink);
+    }
+    .subject-tab.active {
+      color: var(--primary);
+      background: transparent;
+    }
+    .subject-tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--primary);
+      border-radius: 2px 2px 0 0;
+    }
+
+    /* 动画定义 */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in-up {
+      opacity: 0;
+      animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* 1. Hero Section (全宽视觉锚点) */
+    .hero-fullbleed {
+      position: relative;
+      min-height: calc(100vh - 105px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: #0a0e17;
+    }
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.5;
+      transition: transform 10s ease-out;
+    }
+    .hero-fullbleed:hover .hero-bg {
+      transform: scale(1.05);
+    }
+    .hero-overlay {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 24px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      justify-content: center;
+      align-items: flex-start;
     }
-    .placeholder h2 {
-      margin: 0;
+    .hero-title {
+      font-size: clamp(48px, 6vw, 80px);
+      line-height: 1.1;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #fff;
+      margin: 0 0 24px;
+      max-width: 800px;
+    }
+    .hero-desc {
+      font-size: clamp(18px, 2vw, 24px);
+      line-height: 1.5;
+      color: rgba(255, 255, 255, 0.85);
+      margin: 0 0 48px;
+      max-width: 600px;
+      font-weight: 400;
+    }
+    .btn.large {
+      padding: 18px 36px;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 999px;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #fff;
+      color: #0a0e17;
+      border: none;
+    }
+    .btn.large:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(255, 255, 255, 0.2);
+    }
+
+    /* 2. Support Section (功能区) */
+    .support-section {
+      padding: 140px 24px;
+      background: #fff;
+    }
+    .support-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 160px;
+    }
+    .feature-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+    .feature-row.reverse {
+      direction: rtl;
+    }
+    .feature-row.reverse > * {
+      direction: ltr;
+    }
+    .feature-info h3 {
+      font-size: 40px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin: 0 0 24px;
       color: var(--ink);
+    }
+    .feature-info p {
+      font-size: 18px;
+      line-height: 1.6;
+      color: var(--muted);
+      margin: 0 0 40px;
+    }
+    .feature-link {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--primary);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      transition: gap 0.3s ease;
+      gap: 8px;
+    }
+    .feature-link:hover {
+      gap: 16px;
+    }
+    .feature-visual {
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 24px 64px rgba(28, 43, 79, 0.08);
+      aspect-ratio: 4/3;
+      background: var(--bg);
+      position: relative;
+    }
+    .feature-visual img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .feature-visual:hover img {
+      transform: scale(1.03);
+    }
+
+    /* 3. Final CTA (转化区) */
+    .final-cta {
+      padding: 120px 24px 160px;
+      background: #f5f7fb;
+      text-align: center;
+      border-top: 1px solid var(--line);
+    }
+    .final-cta h2 {
+      font-size: 48px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin: 0 0 24px;
+      color: var(--ink);
+    }
+    .final-cta p {
+      font-size: 20px;
+      color: var(--muted);
+      margin: 0 auto 48px;
+      max-width: 600px;
+      line-height: 1.6;
+    }
+    .btn.primary-solid {
+      background: var(--primary);
+      color: #fff;
+      padding: 18px 40px;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 999px;
+      text-decoration: none;
+      display: inline-flex;
+      transition: all 0.3s ease;
+    }
+    .btn.primary-solid:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(58, 122, 254, 0.4);
+    }
+
+    @media (max-width: 992px) {
+      .feature-row {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+      .feature-row.reverse {
+        direction: ltr;
+      }
+      .hero-title {
+        font-size: 40px;
+      }
+      .hero-fullbleed {
+        min-height: 80vh;
+      }
+      .support-section {
+        padding: 80px 24px;
+      }
+      .support-container {
+        gap: 80px;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="site">
-    <header class="topbar">
-      <h1 class="title">教学参考</h1>
-      <div class="auth">
-        <span class="user-badge" id="userBadge"></span>
-        <button id="openRegister">注册</button>
-        <button id="openLogin" class="primary">登录</button>
-        <button id="logoutBtn" class="danger" style="display:none;">退出登录</button>
+  
+  <div class="site-header-wrapper">
+    <div class="site">
+      <header class="topbar">
+        <h1 class="title">教学参考</h1>
+        <div class="auth">
+          <span class="user-badge" id="userBadge"></span>
+          <button id="openRegister">注册</button>
+          <button id="openLogin" class="primary">登录</button>
+          <button id="logoutBtn" class="danger" style="display:none;">退出登录</button>
+        </div>
+      </header>
+      <div class="subject-tabs">
+        <a class="subject-tab active" href="./index.html">首页</a>
+        <a class="subject-tab" href="./math.html">数学</a>
+        <a class="subject-tab" href="./physics.html">物理</a>
+        <a class="subject-tab" href="./chemistry.html">化学</a>
+        <a class="subject-tab" href="./markdown.html">Markdown</a>
       </div>
-    </header>
-
-    <div class="subject-tabs">
-      <a class="subject-tab active" href="./index.html">首页</a>
-      <a class="subject-tab" href="./math.html">数学</a>
-      <a class="subject-tab" href="./physics.html">物理</a>
-      <a class="subject-tab" href="./chemistry.html">化学</a>
-      <a class="subject-tab" href="./markdown.html">Markdown</a>
     </div>
-
-    <section class="placeholder">
-      <h2>首页占位</h2>
-      <div>这里作为网站首页入口页，后续可放课程目录、公告、推荐内容。</div>
-    </section>
   </div>
 
+  <main>
+    <!-- 1. Hero 区域 -->
+    <section class="hero-fullbleed">
+      <img class="hero-bg" src="https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=Dark+moody+abstract+3d+rendering+of+floating+glass+geometry%2C+representing+physics+and+mathematics%2C+cinematic+lighting%2C+deep+blue+and+purple+accents%2C+highly+detailed%2C+8k&image_size=landscape_16_9" alt="Science Background" crossorigin="anonymous" />
+      <div class="hero-overlay">
+        <h2 class="hero-title fade-in-up">交互式科学教育<br/>重新定义</h2>
+        <p class="hero-desc fade-in-up" style="animation-delay: 0.15s">告别枯燥的公式与死记硬背。通过实时的数学建模、物理仿真与化学实验，在动手操作中直观感受科学之美。</p>
+        <div class="fade-in-up" style="animation-delay: 0.3s">
+          <a href="./math.html" class="btn large">开始探索</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Support 区域 -->
+    <section class="support-section">
+      <div class="support-container">
+        <!-- 数学 -->
+        <div class="feature-row">
+          <div class="feature-info">
+            <h3>动态数学作图</h3>
+            <p>通过滑动控制参数，实时观察二次函数一般式、顶点式及焦点准线的变化轨迹，让抽象的代数变得直观，深入理解每一个系数的几何意义。</p>
+            <a href="./math.html" class="feature-link">进入数学沙盒 &rarr;</a>
+          </div>
+          <div class="feature-visual">
+            <img src="https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=Minimalist+3d+glass+parabola+graph+floating+in+bright+studio+environment%2C+ui+design+assets%2C+soft+blue+accent%2C+highly+detailed&image_size=landscape_4_3" alt="Math Simulation" crossorigin="anonymous" />
+          </div>
+        </div>
+        
+        <!-- 物理与化学 -->
+        <div class="feature-row reverse">
+          <div class="feature-info">
+            <h3>沉浸式物理与化学</h3>
+            <p>从理想气体的 P-V 曲线，到浮力实验与酸碱滴定 pH 值计算，您可以亲手调节变量，见证反应过程，用实验数据验证理论知识。</p>
+            <a href="./physics.html" class="feature-link">体验实验 &rarr;</a>
+          </div>
+          <div class="feature-visual">
+            <img src="https://coresg-normal.trae.ai/api/ide/v1/text_to_image?prompt=Minimalist+3d+glass+beakers+and+physics+spheres+floating+in+bright+studio+environment%2C+liquid+with+gradient+colors%2C+soft+lighting%2C+highly+detailed&image_size=landscape_4_3" alt="Physics & Chemistry" crossorigin="anonymous" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Final CTA 区域 -->
+    <section class="final-cta">
+      <h2>准备好开始了吗？</h2>
+      <p>无需安装任何插件，直接在浏览器中开启您的互动学习之旅。</p>
+      <a href="./math.html" class="btn primary-solid">立即体验</a>
+    </section>
+  </main>
+
+  <!-- 登录注册弹窗保持不变 -->
   <div class="modal-wrap" id="authModal">
     <div class="modal">
       <div class="modal-head">
